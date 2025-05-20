@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}SentinelAI - Home{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center my-5">
+    <div class="col-md-8 text-center">
+        <h1 class="display-4 mb-4"><i class="fas fa-shield-alt me-3"></i>SentinelAI</h1>
+        <p class="lead mb-5">
+            An advanced document analysis platform for compliance and due diligence. 
+            Extract insights, generate questions, and get intelligent answers from your documents.
+        </p>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-robot me-2"></i>RAG System</h5>
+            </div>
+            <div class="card-body">
+                <p>Upload your documents to our Retrieval-Augmented Generation (RAG) system and ask questions to get intelligent answers.</p>
+                <ul class="list-group list-group-flush mt-3 mb-4">
+                    <li class="list-group-item"><i class="fas fa-check-circle text-success me-2"></i>Upload PDF, TXT, and DOCX files</li>
+                    <li class="list-group-item"><i class="fas fa-check-circle text-success me-2"></i>Smart chunking and indexing</li>
+                    <li class="list-group-item"><i class="fas fa-check-circle text-success me-2"></i>Get answers backed by your documents</li>
+                </ul>
+                <div class="mt-4">
+                    <a href="{% url 'rag_upload' %}" class="btn btn-primary me-2">
+                        <i class="fas fa-upload me-1"></i> Upload Documents
+                    </a>
+                    <a href="{% url 'rag_qa' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-question-circle me-1"></i> Ask Questions
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-question-circle me-2"></i>Question Generation</h5>
+            </div>
+            <div class="card-body">
+                <p>Upload any PDF document and let our AI generate relevant due diligence questions based on its content.</p>
+                <ul class="list-group list-group-flush mt-3 mb-4">
+                    <li class="list-group-item"><i class="fas fa-check-circle text-success me-2"></i>Smart document section detection</li>
+                    <li class="list-group-item"><i class="fas fa-check-circle text-success me-2"></i>AI-powered question generation</li>
+                    <li class="list-group-item"><i class="fas fa-check-circle text-success me-2"></i>Automatic categorization of questions</li>
+                </ul>
+                <div class="mt-4">
+                    <a href="{% url 'question_generation' %}" class="btn btn-primary">
+                        <i class="fas fa-file-upload me-1"></i> Upload Document for Questions
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-file-alt fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">{{ document_count }}</h5>
+                <p class="card-text">Documents Uploaded</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-question fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">{{ question_count }}</h5>
+                <p class="card-text">Questions Generated</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-key fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">API Key</h5>
+                <p class="card-text">
+                    {% if has_api_key %}
+                        <span class="badge bg-success">Configured</span>
+                    {% else %}
+                        <span class="badge bg-danger">Not Configured</span>
+                    {% endif %}
+                </p>
+                <a href="{% url 'api_key_setup' %}" class="btn btn-sm btn-outline-primary">
+                    {% if has_api_key %}Update{% else %}Configure{% endif %} API Key
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

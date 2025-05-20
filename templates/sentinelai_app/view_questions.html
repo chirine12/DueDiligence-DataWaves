@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}SentinelAI - Generated Questions{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>{{ document.title }}</h5>
+                <a href="{% url 'question_generation' %}" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Generation
+                </a>
+            </div>
+            <div class="card-body">
+                <p>
+                    <strong>Uploaded:</strong> {{ document.uploaded_at|date:"F j, Y, g:i a" }}<br>
+                    <strong>Categories:</strong> {{ questions_by_category|length }}
+                </p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-tags me-2"></i>Categories</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush" id="category-list">
+                            {% for category, questions in questions_by_category.items %}
+                                <a href="#category-{{ forloop.counter }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    {{ category }}
+                                    <span class="badge bg-primary rounded-pill">{{ questions|length }}</span>
+                                </a>
+                            {% empty %}
+                                <div class="list-group-item text-center text-muted">
+                                    No categories found
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                {% for category, questions in questions_by_category.items %}
+                    <div class="card mb-4" id="category-{{ forloop.counter }}">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">{{ category }}</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="accordion" id="accordion-{{ forloop.counter }}">
+                                {% for question in questions %}
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="heading-{{ question.id }}">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                                    data-bs-target="#collapse-{{ question.id }}" aria-expanded="false"
+                                                    aria-controls="collapse-{{ question.id }}">
+                                                {{ question.question }}
+                                            </button>
+                                        </h2>
+                                        <div id="collapse-{{ question.id }}" class="accordion-collapse collapse"
+                                             aria-labelledby="heading-{{ question.id }}" data-bs-parent="#accordion-{{ forloop.parentloop.counter }}">
+                                            <div class="accordion-body">
+                                                <p class="mb-2"><strong>Section:</strong> {{ question.section }}</p>
+                                                <p class="mb-3">Want to see the answer to this question?</p>
+                                                
+                                                <button class="btn btn-primary get-answer-btn" data-question-id="{{ question.id }}">
+                                                    <i class="fas fa-search me-1"></i> Get Answer
+                                                </button>
+                                                
+                                                <div class="answer-container mt-3 d-none">
+                                                    <div class="answer-loading">
+                                                        <div class="spinner-border text-primary" role="status">
+                                                            <span class="visually-hidden">Loading...</span>
+                                                        </div>
+                                                        <span class="ms-2">Generating answer...</span>
+                                                    </div>
+                                                    <div class="answer-content d-none">
+                                                        <h6 class="border-bottom pb-2 mb-3">Answer:</h6>
+                                                        <div class="answer-text"></div>
+                                                    </div>
+                                                    <div class="answer-error d-none">
+                                                        <div class="alert alert-warning">
+                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                            <span class="error-message">Could not generate an answer. Please make sure you have uploaded documents to the RAG system.</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <p class="text-muted">No questions generated for this document.</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Smooth scrolling for category links
+        document.querySelectorAll('#category-list a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Get answer buttons
+        document.querySelectorAll('.get-answer-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const questionId = this.getAttribute('data-question-id');
+                const answerContainer = this.nextElementSibling;
+                const answerLoading = answerContainer.querySelector('.answer-loading');
+                const answerContent = answerContainer.querySelector('.answer-content');
+                const answerError = answerContainer.querySelector('.answer-error');
+                const answerText = answerContainer.querySelector('.answer-text');
+                
+                // Show container and loading
+                answerContainer.classList.remove('d-none');
+                answerLoading.classList.remove('d-none');
+                answerContent.classList.add('d-none');
+                answerError.classList.add('d-none');
+                
+                // Fetch answer
+                fetch(`/api/get-answer/${questionId}/`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to get answer');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        answerLoading.classList.add('d-none');
+                        answerContent.classList.remove('d-none');
+                        answerText.textContent = data.answer;
+                    })
+                    .catch(error => {
+                        answerLoading.classList.add('d-none');
+                        answerError.classList.remove('d-none');
+                        console.error('Error:', error);
+                    });
+            });
+        });
+    });
+</script>
+{% endblock %} 

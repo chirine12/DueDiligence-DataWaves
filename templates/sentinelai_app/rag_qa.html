@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load form_tags %}
+{% block title %}SentinelAI - Ask Questions{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-question-circle me-2"></i>Ask Questions</h5>
+            </div>
+            <div class="card-body">
+                {% if documents %}
+                    <p class="mb-4">
+                        Ask questions about your uploaded documents. The system will search for the most relevant information
+                        and generate an answer based on the content using Gemma 2 9B model.
+                    </p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="{{ form.question.id_for_label }}" class="form-label">{{ form.question.label }}</label>
+                            {{ form.question|addclass:"form-control" }}
+                            {% if form.question.errors %}
+                                <div class="invalid-feedback d-block">{{ form.question.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid gap-2 col-md-6 mx-auto">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-2"></i>Get Answer
+                            </button>
+                        </div>
+                    </form>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        You need to upload and process documents first before asking questions.
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <a href="{% url 'rag_upload' %}" class="btn btn-primary">
+                            <i class="fas fa-upload me-1"></i> Upload Documents
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if question and results %}
+            <h4 class="mb-3">Results for: "{{ question }}"</h4>
+            
+            {% for result in results %}
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">{{ result.document }}</h5>
+                        <span class="badge bg-success">Gemma 2 9B</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="answer mb-4">
+                            <h6 class="border-bottom pb-2 mb-3">Answer:</h6>
+                            <div class="bg-light p-3 rounded">
+                                {% autoescape off %}
+                                    {% with result.answer|linebreaks as formatted_answer %}
+                                        {{ formatted_answer }}
+                                    {% endwith %}
+                                {% endautoescape %}
+                            </div>
+                        </div>
+                        
+                        <div class="sources">
+                            <h6 class="border-bottom pb-2 mb-3">Retrieved Passages:</h6>
+                            <div class="accordion" id="sourcesAccordion-{{ forloop.counter }}">
+                                {% for source in result.sources %}
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                                data-bs-target="#source-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" 
+                                                aria-expanded="false" aria-controls="source-{{ forloop.counter }}">
+                                                Passage {{ forloop.counter }}
+                                            </button>
+                                        </h2>
+                                        <div id="source-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" 
+                                             class="accordion-collapse collapse" 
+                                             data-bs-parent="#sourcesAccordion-{{ forloop.parentloop.counter }}">
+                                            <div class="accordion-body">
+                                                <p class="mb-0">{{ source }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

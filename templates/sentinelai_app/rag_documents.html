@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}SentinelAI - Document Library{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Document Library</h5>
+                <a href="{% url 'rag_upload' %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus me-1"></i> Upload New Document
+                </a>
+            </div>
+            <div class="card-body">
+                {% if documents %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>Uploaded</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for document in documents %}
+                                    <tr>
+                                        <td>{{ document.title }}</td>
+                                        <td>
+                                            <span class="badge {% if document.file_type == 'pdf' %}bg-danger{% elif document.file_type == 'txt' %}bg-secondary{% else %}bg-info{% endif %}">
+                                                {{ document.file_type|upper }}
+                                            </span>
+                                        </td>
+                                        <td>{{ document.uploaded_at|date:"M d, Y" }}</td>
+                                        <td>
+                                            {% if document.processed %}
+                                                <span class="badge bg-success">Processed</span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center p-4">
+                        <i class="fas fa-file-upload fa-3x text-secondary mb-3"></i>
+                        <p class="lead">No documents have been uploaded yet.</p>
+                        <a href="{% url 'rag_upload' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i> Upload Your First Document
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

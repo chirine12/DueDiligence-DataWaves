@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}SentinelAI - Question Generation{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-question-circle me-2"></i>Question Generation</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-4">
+                    Upload a PDF document to generate due diligence questions. The system will:
+                </p>
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-file-pdf fa-2x text-danger mb-3"></i>
+                                <h6>Step 1</h6>
+                                <p class="small">Analyze document structure and extract sections</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-brain fa-2x text-primary mb-3"></i>
+                                <h6>Step 2</h6>
+                                <p class="small">Generate relevant questions for each section</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-tags fa-2x text-success mb-3"></i>
+                                <h6>Step 3</h6>
+                                <p class="small">Categorize questions by compliance domain</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <form method="post" enctype="multipart/form-data" class="dropzone-form">
+                    {% csrf_token %}
+                    <div class="mb-4 text-center">
+                        <div class="file-drop-area">
+                            <span class="fake-btn"><i class="fas fa-file-upload me-2"></i>Choose file</span>
+                            <span class="file-msg">or drag and drop file here</span>
+                            <input type="file" name="document" class="file-input" accept=".pdf" required>
+                        </div>
+                        <div class="mt-2 text-muted small">Only PDF files are supported.</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 col-md-6 mx-auto">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-magic me-2"></i>Generate Questions
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .file-drop-area {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        max-width: 450px;
+        padding: 25px;
+        border: 2px dashed var(--secondary-color);
+        border-radius: 3px;
+        transition: 0.2s;
+        margin: 0 auto;
+        background-color: #f8f9fa;
+    }
+
+    .file-drop-area.is-active {
+        background-color: rgba(52, 152, 219, 0.05);
+    }
+
+    .fake-btn {
+        flex-shrink: 0;
+        background-color: var(--secondary-color);
+        border-radius: 3px;
+        padding: 8px 15px;
+        margin-right: 10px;
+        font-size: 12px;
+        text-transform: uppercase;
+        color: #fff;
+    }
+
+    .file-msg {
+        font-size: small;
+        font-weight: 300;
+        line-height: 1.4;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .file-input {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 100%;
+        cursor: pointer;
+        opacity: 0;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const $fileInput = document.querySelector('.file-input');
+        const $droparea = document.querySelector('.file-drop-area');
+        const $fileMsg = document.querySelector('.file-msg');
+        
+        $fileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const fileName = this.files[0].name;
+                $fileMsg.innerHTML = 'Selected: ' + fileName;
+            }
+        });
+        
+        $droparea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('is-active');
+        });
+        
+        $droparea.addEventListener('dragleave', function() {
+            this.classList.remove('is-active');
+        });
+        
+        $droparea.addEventListener('drop', function() {
+            this.classList.remove('is-active');
+        });
+    });
+</script>
+{% endblock %} 

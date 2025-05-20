@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load form_tags %}
+{% block title %}SentinelAI - API Key Setup{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-key me-2"></i>Groq API Key Setup</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-4">
+                    <i class="fas fa-info-circle text-primary me-2"></i>
+                    The question generation feature requires a Groq API key. Please enter your key below.
+                </p>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="{{ form.api_key.id_for_label }}" class="form-label">
+                            {{ form.api_key.label }}
+                        </label>
+                        <div class="input-group">
+                            {{ form.api_key|addclass:"form-control" }}
+                            {% if form.api_key.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.api_key.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="form-text">
+                            Your API key is stored only in your session. It is not permanently stored in our database.
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save API Key
+                        </button>
+                    </div>
+                </form>
+                
+                <hr class="my-4">
+                
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-info-circle me-2"></i>How to get a Groq API Key:</h6>
+                    <ol class="mb-0">
+                        <li>Visit <a href="https://console.groq.com/keys" target="_blank">https://console.groq.com/keys</a></li>
+                        <li>Sign up for a Groq account if you don't have one</li>
+                        <li>Create a new API key in your account</li>
+                        <li>Copy and paste the key in the form above</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

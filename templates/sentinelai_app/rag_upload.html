@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load form_tags %}
+{% block title %}SentinelAI - Upload Documents{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-upload me-2"></i>Upload Documents for RAG</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-4">
+                    Upload documents to be processed for the Retrieval-Augmented Generation system.
+                    These documents will be chunked, embedded, and stored in a vector database for question answering.
+                </p>
+                
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>
+                        {{ form.title|addclass:"form-control" }}
+                        {% if form.title.errors %}
+                            <div class="invalid-feedback d-block">{{ form.title.errors }}</div>
+                        {% endif %}
+                        <div class="form-text">Enter a descriptive title for the document.</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="{{ form.file.id_for_label }}" class="form-label">{{ form.file.label }}</label>
+                        {{ form.file|addclass:"form-control" }}
+                        {% if form.file.errors %}
+                            <div class="invalid-feedback d-block">{{ form.file.errors }}</div>
+                        {% endif %}
+                        <div class="form-text">Supported file types: PDF, TXT, DOCX</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 col-md-6 mx-auto">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-upload me-2"></i>Upload & Process Document
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
